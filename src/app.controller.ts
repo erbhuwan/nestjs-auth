@@ -1,4 +1,4 @@
-import { Controller, Get, HttpStatus, Version } from '@nestjs/common';
+import { Controller, Get, Version } from '@nestjs/common';
 import { AppService } from './app.service';
 
 @Controller()
@@ -9,10 +9,6 @@ export class AppController {
   @Version('1')
   getHello() {
     const data = this.appService.getHello();
-    return {
-      statusCode: HttpStatus.OK,
-      data: data,
-      errors: null,
-    };
+    return data;
   }
 }
