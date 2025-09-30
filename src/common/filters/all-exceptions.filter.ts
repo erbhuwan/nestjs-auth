@@ -51,7 +51,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     const duration: number = Date.now() - startTime;
 
+    const correlationId =
+      typeof request.id === 'string' ? request.id : JSON.stringify(request.id);
+
+    response.setHeader('x-correlation-id', correlationId);
+
     const errorResponse: ApiResponse<null> = {
+      requestId: correlationId,
       statusCode: status,
       success: false,
       message,
@@ -60,7 +66,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       timestamp: new Date().toISOString(),
       path: request.url,
       method: request.method,
-      apiVersion: request.url.split('/')[1] ?? 'v1',
+      apiVersion: request.url.split('/')[1],
       duration,
       meta: null,
     };

@@ -22,12 +22,18 @@ export class ResponseInterceptor<T>
     const statusCode = response.statusCode;
     const startTime = Date.now();
 
+    const correlationId =
+      typeof request.id === 'string' ? request.id : JSON.stringify(request.id);
+
+    response.setHeader('x-correlation-id', correlationId);
+
     return next.handle().pipe(
       map((data: T & { message?: string; data?: T; meta?: unknown }) => {
         // Calculate duration in ms
         const duration = Date.now() - startTime;
 
         return {
+          requestId: correlationId,
           statusCode,
           success: true,
           message: data?.message ?? 'Success',

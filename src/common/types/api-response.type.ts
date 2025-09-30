@@ -1,4 +1,5 @@
 export interface ApiResponse<T> {
+  requestId: string;
   statusCode: number; // HTTP status code
   success: boolean; // true for success, false for errors
   message: string; // human-readable message
