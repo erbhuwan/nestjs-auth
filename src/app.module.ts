@@ -8,6 +8,8 @@ import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { join } from 'path';
+import { IncomingMessage, ServerResponse } from 'http';
+import { Request } from 'express';
 
 @Module({
   imports: [
@@ -18,8 +20,28 @@ import { join } from 'path';
         return {
           pinoHttp: {
             level: process.env.NODE_ENV !== 'production' ? 'debug' : 'info',
-            genReqId: (request) =>
-              request.headers['x-correlation-id'] || uuidv4(),
+
+            genReqId: (req) => req.headers['x-correlation-id'] || uuidv4(),
+
+            customLogLevel: (_, res, err) => {
+              if (err || res.statusCode >= 500) return 'error';
+              if (res.statusCode >= 400) return 'warn';
+              return 'info';
+            },
+            serializers: {
+              req: (req: IncomingMessage & Request) => ({
+                id: req.id,
+                method: req.method,
+                url: req.url,
+                query: req.query,
+                params: req.params,
+                remoteAddress: req.socket?.remoteAddress,
+                remotePort: req.socket?.remotePort,
+              }),
+              res: (res: ServerResponse) => ({
+                statusCode: res.statusCode,
+              }),
+            },
             transport: {
               targets: [
                 {
@@ -31,7 +53,7 @@ import { join } from 'path';
                   },
                 },
                 {
-                  target: 'pino-roll',
+                  target: 'pino-roll', // file output
                   options: {
                     file: join(__dirname, '..', 'logs', 'app.log'),
                     frequency: 'daily', // Rotate daily
@@ -42,7 +64,7 @@ import { join } from 'path';
                 },
               ],
             },
-            redact: ['req.headers.authorization'],
+            redact: ['req.headers.authorization', 'req.headers.cookie'],
           },
         };
       },

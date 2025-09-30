@@ -3,9 +3,13 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { VersioningType } from '@nestjs/common';
 import { Logger } from 'nestjs-pino';
+import helmet from 'helmet';
+import { HELMET_CONFIG } from './common/configs/helmet.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.use(helmet(HELMET_CONFIG));
 
   const logger = app.get(Logger);
 
