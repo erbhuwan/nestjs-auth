@@ -4,12 +4,13 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { LoggerModule } from 'nestjs-pino';
 import { v4 as uuidv4 } from 'uuid';
-import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { join } from 'path';
 import { IncomingMessage, ServerResponse } from 'http';
 import { Request } from 'express';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -56,10 +57,10 @@ import { Request } from 'express';
                   target: 'pino-roll', // file output
                   options: {
                     file: join(__dirname, '..', 'logs', 'app.log'),
-                    frequency: 'daily', // Rotate daily
-                    size: '10M', // Max size per file
-                    maxFiles: 30, // Keep logs for 30 days
-                    mkdir: true, // Create directory if it doesn't exist
+                    frequency: 'daily',
+                    size: '10M',
+                    maxFiles: 30,
+                    mkdir: true,
                   },
                 },
               ],
@@ -73,6 +74,17 @@ import { Request } from 'express';
       isGlobal: true,
       envFilePath: ['.env'],
     }),
+    ThrottlerModule.forRoot({
+      errorMessage() {
+        return 'Too many requests!';
+      },
+      throttlers: [
+        {
+          ttl: 60 * 1000,
+          limit: 100,
+        },
+      ],
+    }),
   ],
   controllers: [AppController],
   providers: [
@@ -84,6 +96,10 @@ import { Request } from 'express';
     {
       provide: APP_FILTER,
       useClass: AllExceptionsFilter,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
   ],
 })
