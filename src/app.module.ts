@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { LoggerModule } from 'nestjs-pino';
@@ -11,6 +12,7 @@ import { join } from 'path';
 import { IncomingMessage, ServerResponse } from 'http';
 import { Request } from 'express';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { databaseConfig } from './common/configs/database.config';
 
 @Module({
   imports: [
@@ -84,6 +86,11 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
           limit: 100,
         },
       ],
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: databaseConfig,
+      inject: [ConfigService],
     }),
   ],
   controllers: [AppController],
