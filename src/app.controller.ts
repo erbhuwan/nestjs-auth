@@ -11,13 +11,13 @@ export class AppController {
   @Get()
   @Version(VERSION.V1)
   @ApiOperation({ summary: 'Get welcome message' })
-  @ApiResponse({ 
-    status: 200, 
+  @ApiResponse({
+    status: 200,
     description: 'Returns a welcome message',
     schema: {
       type: 'string',
-      example: 'Hello World!'
-    }
+      example: 'Hello World!',
+    },
   })
   getHello() {
     const data = this.appService.getHello();

@@ -1,9 +1,18 @@
-import { Injectable, ConflictException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { User, UserStatus } from './entities/user.entity';
-import { RegisterDto, UpdateProfileDto, ChangePasswordDto } from '../auth/dto/auth.dto';
+import {
+  RegisterDto,
+  UpdateProfileDto,
+  ChangePasswordDto,
+} from '../auth/dto/auth.dto';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -63,7 +72,10 @@ export class UsersService {
     });
   }
 
-  async updateRefreshToken(userId: string, refreshToken: string): Promise<void> {
+  async updateRefreshToken(
+    userId: string,
+    refreshToken: string,
+  ): Promise<void> {
     await this.userRepository.update(userId, {
       refreshToken,
     });
@@ -71,11 +83,14 @@ export class UsersService {
 
   async removeRefreshToken(userId: string): Promise<void> {
     await this.userRepository.update(userId, {
-      refreshToken: null as any,
+      refreshToken: null,
     });
   }
 
-  async updateProfile(userId: string, updateProfileDto: UpdateProfileDto): Promise<User> {
+  async updateProfile(
+    userId: string,
+    updateProfileDto: UpdateProfileDto,
+  ): Promise<User> {
     const user = await this.findById(userId);
     if (!user) {
       throw new NotFoundException('User not found');
@@ -97,19 +112,28 @@ export class UsersService {
     return updatedUser;
   }
 
-  async changePassword(userId: string, changePasswordDto: ChangePasswordDto): Promise<void> {
+  async changePassword(
+    userId: string,
+    changePasswordDto: ChangePasswordDto,
+  ): Promise<void> {
     const user = await this.findById(userId);
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    const isCurrentPasswordValid = await this.validatePassword(user, changePasswordDto.currentPassword);
+    const isCurrentPasswordValid = await this.validatePassword(
+      user,
+      changePasswordDto.currentPassword,
+    );
     if (!isCurrentPasswordValid) {
       throw new UnauthorizedException('Current password is incorrect');
     }
 
     const saltRounds = this.configService.get<number>('bcrypt.rounds') || 12;
-    const hashedNewPassword = await bcrypt.hash(changePasswordDto.newPassword, saltRounds);
+    const hashedNewPassword = await bcrypt.hash(
+      changePasswordDto.newPassword,
+      saltRounds,
+    );
 
     await this.userRepository.update(userId, {
       password: hashedNewPassword,
@@ -130,7 +154,16 @@ export class UsersService {
 
   async findAll(): Promise<User[]> {
     return await this.userRepository.find({
-      select: ['id', 'firstName', 'lastName', 'email', 'role', 'status', 'createdAt', 'lastLoginAt'],
+      select: [
+        'id',
+        'firstName',
+        'lastName',
+        'email',
+        'role',
+        'status',
+        'createdAt',
+        'lastLoginAt',
+      ],
     });
   }
 

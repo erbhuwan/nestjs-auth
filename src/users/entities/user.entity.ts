@@ -7,7 +7,13 @@ import {
   Index,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
-import { IsEmail, IsNotEmpty, IsOptional, IsEnum, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsEnum,
+  MinLength,
+} from 'class-validator';
 
 export enum UserRole {
   ADMIN = 'admin',
