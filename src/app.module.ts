@@ -13,6 +13,9 @@ import { IncomingMessage, ServerResponse } from 'http';
 import { Request } from 'express';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { databaseConfig } from './common/configs/database.config';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -92,6 +95,8 @@ import { databaseConfig } from './common/configs/database.config';
       useFactory: databaseConfig,
       inject: [ConfigService],
     }),
+    AuthModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [
@@ -107,6 +112,10 @@ import { databaseConfig } from './common/configs/database.config';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
     },
   ],
 })
