@@ -1,236 +1,86 @@
-# NestJS Auth
+# nestjs-auth
 
-A **NestJS authentication starter project** with Git hooks, commit linting, and code formatting pre-configured.
+A minimal, beginner-friendly authentication boilerplate for NestJS.
 
----
+## What this is
 
-## 🔧 Features
+A simple starting point for authentication in NestJS apps including JWT auth, refresh tokens, and role checks. Built to be easy to read and extend.
 
-- 🚀 **NestJS** — scalable server-side framework  
-- 🧹 **Prettier** — automatic code formatting
-- 🛡️ **ESLint** — code linting for consistent style
-- 📝 **Commitlint** — enforce [Conventional Commits](https://www.conventionalcommits.org/)
-- 🪝 **Husky + lint-staged** — run linters & formatters on staged files before commit
-- 🗄️ **TypeORM + PostgreSQL** — database integration with migrations
-- ⚙️ **Environment-based configuration** — flexible config management
+## Features
 
----
+- User registration and login (JWT)
+- Access / refresh tokens
+- Basic role-based access control
+- Clear, modular structure
 
-## ⚙️ Setup
+## Prerequisites
 
-1. Clone the repo:
-   ```sh
-   git clone https://github.com/your-username/nestjs-auth.git
-   cd nestjs-auth
-   ```
+- Node.js v16+  
+- npm or yarn  
+- A database (Postgres, MySQL, SQLite, etc.)
 
-2. Install dependencies:
-   ```sh
-   npm install
-   ```
+## Quick start
 
-3. Set up the database:
-    ```sh
-    # Copy environment variables
-    cp .env.example .env
-
-    # Edit .env with your database credentials
-    # Make sure PostgreSQL is running locally
-    ```
-
-4. Run database migrations:
-    ```sh
-    npm run migration:run
-    ```
-
-5. Start development server:
-    ```sh
-    npm run start:dev
-    ```
-
----
-
-## 🪝 Git Hooks
-
-This project uses **Husky** with the following hooks:
-
-- `pre-commit`: runs Prettier/ESLint on staged files (`lint-staged`)
-- `commit-msg`: runs Commitlint to check commit message format
-
----
-
-## 🗄️ Database Setup
-
-### PostgreSQL Installation
-
-**macOS:**
-```sh
-# Using Homebrew
-brew install postgresql
-
-# Start PostgreSQL service
-brew services start postgresql
+```bash
+git clone https://github.com/erbhuwan/nestjs-auth.git
+cd nestjs-auth
+cp .env.example .env   # or copy manually on Windows
+npm install
+npm run start:dev
 ```
 
-**Ubuntu/Debian:**
-```sh
-sudo apt update
-sudo apt install postgresql postgresql-contrib
-sudo systemctl start postgresql
-sudo systemctl enable postgresql
+Server should start on the port in your `.env` (default `3000`).
+
+## Configuration
+
+Copy `.env.example` to `.env` and set the values:
+
+| Variable             | Description                             | Example            |
+|----------------------|-----------------------------------------|--------------------|
+| `PORT`               | App port                                | `3000`             |
+| `DATABASE_URL`       | Database connection string              | `postgres://...`   |
+| `JWT_SECRET`         | Secret used to sign access tokens       | `a-very-secret`    |
+| `JWT_EXPIRATION`     | Access token TTL                        | `1h`               |
+| `REFRESH_TOKEN_SECRET`| Secret for refresh tokens               | `another-secret`   |
+
+(Only set what your app requires; keep secrets out of source control.)
+
+## Usage
+
+Common endpoints (adjust to actual routes in the code):
+
+- `POST /auth/register` — register a new user  
+- `POST /auth/login` — obtain access + refresh tokens  
+- `POST /auth/refresh` — exchange refresh token for access token  
+- Protected routes use an auth guard and may check roles
+
+Example request to login:
+
+```bash
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"user","password":"pass"}'
 ```
 
-**Docker (Alternative):**
-```sh
-# Run PostgreSQL in Docker
-docker run --name postgres-nestjs \
-  -e POSTGRES_PASSWORD=your_password \
-  -e POSTGRES_DB=nestjs_auth \
-  -p 5432:5432 \
-  -d postgres:15
-```
+## Testing
 
-### Database Configuration
+Use Postman, curl, or your preferred client. Add tests later as needed.
 
-1. **Environment Variables:**
-   ```sh
-   cp .env.example .env
-   ```
+## Contributing
 
-   Edit `.env` with your database credentials:
-   ```env
-   DB_HOST=localhost
-   DB_PORT=5432
-   DB_USERNAME=postgres
-   DB_PASSWORD=your_password
-   DB_DATABASE=nestjs_auth
-   DB_SYNCHRONIZE=false
-   DB_LOGGING=true
-   ```
+If you want to contribute:
 
-2. **Database Creation:**
-   ```sh
-   # Connect to PostgreSQL
-   psql -h localhost -U postgres
+1. Fork the repo  
+2. Create a branch: `git checkout -b feature/short-description`  
+3. Make changes, commit with a clear message  
+4. Push and open a PR describing the change
 
-   # Create database
-   CREATE DATABASE nestjs_auth;
-   ```
+See `CONTRIBUTING.md` for style and PR guidance.
 
-### Database Migrations
+## License
 
-This project uses **TypeORM** with migrations for database schema management:
+This project is licensed under the MIT license (see LICENSE or <http://opensource.org/licenses/MIT>)
 
-```sh
-# Generate new migration from entity changes
-npm run migration:generate -- src/migrations/MigrationName
+## Author / Maintainer
 
-# Run pending migrations
-npm run migration:run
-
-# Revert last migration
-npm run migration:revert
-
-# Show migration status
-npm run migration:show
-
-# Create empty migration
-npm run migration:create -- src/migrations/MigrationName
-```
-
-### Migration Scripts
-
-All migration commands are available in `package.json`:
-
-- `migration:generate` — generate migrations from entity changes
-- `migration:run` — execute pending migrations
-- `migration:revert` — rollback last migration
-- `migration:show` — display migration status
-- `migration:create` — create new empty migration
-
-### Best Practices
-
-- **Never enable `DB_SYNCHRONIZE=true` in production**
-- **Always run migrations in a transaction**
-- **Test migrations on a copy of production data first**
-- **Keep migrations backward compatible**
-- **Use descriptive migration names**
-
-### Troubleshooting
-
-**Connection Issues:**
-```sh
-# Check if PostgreSQL is running
-pg_isready -h localhost -p 5432
-
-# View PostgreSQL logs
-tail -f /usr/local/var/log/postgres.log  # macOS
-tail -f /var/log/postgresql/postgresql-*.log  # Linux
-```
-
-**Permission Issues:**
-```sh
-# Fix database permissions
-psql -h localhost -U postgres
-GRANT ALL PRIVILEGES ON DATABASE nestjs_auth TO your_username;
-```
-
----
-
-## 📝 Commit Convention
-
-All commits follow [Conventional Commits](https://www.conventionalcommits.org/):
-
-Examples:
-```
-feat(auth): add JWT strategy
-fix(api): correct response format
-chore(deps): bump dependency versions
-```
-
----
-
-## 📦 Scripts
-
-### Application Scripts
-- `npm run start:dev` — start NestJS in watch mode
-- `npm run start:prod` — start NestJS in production mode
-- `npm run build` — build the application
-- `npm run lint` — run ESLint
-- `npm run format` — run Prettier
-- `npm test` — run tests (Jest, with `--passWithNoTests` enabled)
-
-### Database Scripts
-- `npm run migration:generate` — generate new migration from entity changes
-- `npm run migration:run` — execute pending migrations
-- `npm run migration:revert` — rollback last migration
-- `npm run migration:show` — display migration status
-- `npm run migration:create` — create new empty migration
-
----
-
-## 📂 Project Structure
-
-```
-nestjs-auth/
-├── src/                          # source code
-│   ├── common/
-│   │   └── configs/
-│   │       └── database.config.ts # TypeORM configuration
-│   ├── migrations/               # database migrations
-│   ├── app.controller.ts
-│   ├── app.module.ts
-│   └── main.ts
-├── .env.example                  # environment variables template
-├── typeorm.config.ts             # TypeORM CLI configuration
-├── test/                         # test files
-├── commitlint.config.cjs
-├── eslint.config.mjs
-├── prettier.config.js
-├── package.json
-└── README.md
-```
-
----
-
-✨ Happy coding!
+`erbhuwan` (check repo for contact details)
