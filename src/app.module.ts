@@ -12,10 +12,11 @@ import { join } from 'path';
 import { IncomingMessage, ServerResponse } from 'http';
 import { Request } from 'express';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { databaseConfig } from './common/configs/database.config';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { DatabaseConfig } from './common/configs/database/database.config';
+import { DatabaseModule } from './common/configs/database/database.module';
 
 @Module({
   imports: [
@@ -91,9 +92,9 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
       ],
     }),
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: databaseConfig,
-      inject: [ConfigService],
+      imports: [DatabaseModule],
+      inject: [DatabaseConfig],
+      useFactory: (dbConfig: DatabaseConfig) => dbConfig.getTypeOrmConfig(),
     }),
     AuthModule,
     UsersModule,
