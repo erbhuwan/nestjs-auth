@@ -79,7 +79,7 @@ See `CONTRIBUTING.md` for style and PR guidance.
 
 ## License
 
-MIT — see `LICENSE`.
+This project is licensed under the MIT license (see LICENSE or <http://opensource.org/licenses/MIT>)
 
 ## Author / Maintainer
 
