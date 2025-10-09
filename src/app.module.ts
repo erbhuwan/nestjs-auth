@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { LoggerModule } from 'nestjs-pino';
@@ -15,8 +14,8 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
-import { DatabaseConfig } from './common/configs/database/database.config';
-import { DatabaseModule } from './common/configs/database/database.module';
+import { DatabaseModule } from './database/database.module';
+import { RefreshTokenModule } from './refresh-token/refresh-token.module';
 
 @Module({
   imports: [
@@ -91,13 +90,10 @@ import { DatabaseModule } from './common/configs/database/database.module';
         },
       ],
     }),
-    TypeOrmModule.forRootAsync({
-      imports: [DatabaseModule],
-      inject: [DatabaseConfig],
-      useFactory: (dbConfig: DatabaseConfig) => dbConfig.getTypeOrmConfig(),
-    }),
     AuthModule,
     UsersModule,
+    DatabaseModule,
+    RefreshTokenModule,
   ],
   controllers: [AppController],
   providers: [
